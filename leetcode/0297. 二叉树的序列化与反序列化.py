@@ -6,32 +6,17 @@ class Codec:
         :type root: TreeNode
         :rtype: str
         """
-        return self.seri_helper(root, 1001)
-
-    def seri_helper(self, root, depth):
-        if root == None: return []
+        if root == None: return [-1001]
         ans = [root.val]
-        ans = ans + [-depth] + self.seri_helper(root.left, depth + 1)
-        ans = ans + [-depth] + self.seri_helper(root.right, depth + 1)
+        ans = ans + self.serialize(root.left)
+        ans = ans + self.serialize(root.right)
         return ans
 
+
     def deserialize(self, data):
-        """Decodes your encoded data to tree.
-
-        :type data: str
-        :rtype: TreeNode
-        """
-        return self.dese_helper(data, 1001)
-
-    def dese_helper(self, data, depth):
-        if len(data) == 0: return None
-        root = TreeNode(data[0])
-        if len(data) == 1: return root
-
-        index1 = data.index(-depth, 1)
-        index2 = data.index(-depth, index1 + 1)
-        left = self.dese_helper(data[index1 + 1:index2], depth + 1)
-        right = self.dese_helper(data[index2 + 1:], depth + 1)
-        root.left = left
-        root.right = right
+        val = data.pop(0)
+        if val == -1001: return None
+        root = TreeNode(val)
+        root.left = self.deserialize(data)
+        root.right = self.deserialize(data)
         return root
