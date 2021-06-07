@@ -1,23 +1,23 @@
 from collections import defaultdict
 class Solution:
     def verticalTraversal(self, root: TreeNode):
-        d = defaultdict(list)
-        self.generate(d, root, 0, 0)
+        pos = defaultdict(list)
+        self.generate(pos, root, 0, 0)
         ans = []
-        tmp = -10000
-        curr = []
-        for i, j in sorted(d.keys()):
-            if i != tmp:
-                if len(curr) > 0:
-                    ans.append(curr)
-                    curr = []
-            curr.extend(sorted(d[i, j]))
-            tmp = i
-        if len(curr) > 0: ans.append(curr)
+        curr_col = []
+        for (col, row), vals in sorted(pos.items()):
+            if len(curr_col) == 0:
+                curr_col = [col]
+            elif col != curr_col[0]:
+                ans.append(curr_col[1:])
+                curr_col = [col]
+            curr_col.extend(sorted(vals))
+        if len(curr_col):
+            ans.append(curr_col[1:])
         return ans
 
-    def generate(self, d, root, col, row):
-        if root == None: return
-        d[(col, row)].append(root.val)
-        self.generate(d, root.right, col + 1, row + 1)
-        self.generate(d, root.left, col - 1, row + 1)
+    def generate(self, pos, root, row, col):
+        if not root: return
+        pos[(col, row)].append(root.val)
+        self.generate(pos, root.left, row + 1, col - 1)
+        self.generate(pos, root.right, row + 1, col + 1)
