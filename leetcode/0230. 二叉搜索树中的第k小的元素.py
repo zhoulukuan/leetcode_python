@@ -1,12 +1,13 @@
-class Solution:
-    def kthSmallest(self, root: TreeNode, k: int) -> int:
-        ans = []
-        while True:
-            while root is not None:
-                ans.append(root)
-                root = root.left
-            root = ans.pop()
-            k -= 1
-            if k == 0: 
-                return root.val
-            root = root.right
+class Solution:
+    def kthSmallest(self, root: TreeNode, k: int) -> int:
+        stack = []
+        while stack or root:
+            while root:
+                stack.append(root)
+                root = root.left
+            node = stack.pop()
+            k -= 1
+            if k == 0: return node.val
+            if node.right:
+                root = node.right
+        return -1
