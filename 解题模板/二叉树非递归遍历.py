@@ -21,10 +21,9 @@ class Visit:
                 root = root.left
             # 弹出栈内节点
             node = stack.pop()
-            # 若该节点不存在右节点,则什么也不做,root仍然是None,会继续弹出下一个节点
+            # 若该节点不存在右节点,则root是None,会继续弹出下一个节点
             # 若存在右节点,则root被设置为右节点,程序转入右树去打印当前弹出节点的右树结果
-            if node.right:
-                root = node.right
+            root = node.right
         return seri
 
     # 先序遍历
@@ -39,8 +38,7 @@ class Visit:
             # 区分点: 不是在节点入栈的时候访问,因为节点可能存在左节点
             # 出栈的时候,因为根节点都在父节点前,可以直接打印
             seri.append(node.val)
-            if node.right:
-                root = node.right
+            root = node.right
         return seri
 
     # 后序遍历
