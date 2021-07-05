@@ -1,31 +1,31 @@
-class Solution:
-    def restoreIpAddresses(self, s: str):
-        self.n = len(s)
-        self.s = s + "######"
-        ans = []
-        ip = []
-        self.helper(0, ip, ans)
-        return ans
+class Solution:
+    def restoreIpAddresses(self, s: str) -> List[str]:
+        n = len(s)
+        s = s + "#####"
+        ans = []
+        self.dfs(0, n, s, [], ans)
+        return ans
 
-    def helper(self, start, ip, ans):
-        num = len(ip)
-        # 字符串用完则看是否刚好有4个数字
-        if start == self.n and num == 4:
-            ans.append('.'.join(ip))
-            return
-        # 越界终止
-        if start > self.n or num > 4: return
-        # 字符串没用完已经有4个数字或者字符串用完不到4个数字
-        if start == self.n or num == 4: return
+    def dfs(self, i, n, s, path, ans):
+        resNum = 4 - len(path)
+        # 满足条件
+        if i == n and resNum == 0: 
+            ans.append(".".join(path))
+            return
+        # 剪枝
+        if i >= n or resNum * 3 < n - i or resNum > n - i:
+            return
 
-        # 字符串小于n且数字小于4个
-        if (self.range(self.s[start], 0, 9)):
-            self.helper(start + 1, ip + [self.s[start]], ans)
-        if (self.range(self.s[start:start+2], 10, 99)):
-            self.helper(start + 2, ip + [self.s[start:start+2]], ans)
-        if (self.range(self.s[start:start+3], 100, 255)):
-            self.helper(start + 3, ip + [self.s[start:start+3]], ans)
+        num = s[i:i+1]
+        if self.valid(num):
+            self.dfs(i+1, n, s, path + [num], ans)
+        num = s[i:i+2]
+        if self.valid(num):
+            self.dfs(i+2, n, s, path + [num], ans)
+        num = s[i:i+3]
+        if self.valid(num):
+            self.dfs(i+3, n, s, path + [num], ans)
 
-    def range(self, string, low, hi):
-        if "#" in string: return False
-        return int(string) >= low and int(string) <= hi
+    def valid(self, num):
+        if "#" in num or (num[0] == '0' and num != "0"): return False
+        return int(num) <= 255
