@@ -1,94 +1,43 @@
-# 法一:递归+二分法,有序的一边用二分查找,山峰的一边用递归
 class Solution:
-    def findInMountainArray(self, target: int, mountain_arr: 'MountainArray') -> int:
+    def findInMountainArray(self, target: int, mountain_arr) -> int:
         n = mountain_arr.length()
-        return self._find_from_mountain_array(target, mountain_arr, 0, n - 1,
-                                              mountain_arr.get(0), mountain_arr.get(n - 1))
+        return self.find(mountain_arr, 0, n - 1, target)
 
-    def _find_from_mountain_array(self, target, mountain_arr, lo, hi, vlo, vhi):
-        # 递归终止状态
-        if lo > hi: return -1
-        if lo == hi: return lo if vlo == target else -1
-        
-        # 函数运算过程
-        mid = lo + (hi - lo) // 2
-        vmid = mountain_arr.get(mid)
-        vnext = mountain_arr.get(mid + 1)
-        if vmid < vnext:
-            i = self._find_from_monotonic_array(target, mountain_arr, lo, mid, vlo, vmid, True)
-            if i != -1: return i
-            return self._find_from_mountain_array(target, mountain_arr, mid + 1, hi, vnext, vhi)
-        else:
-            i = self._find_from_mountain_array(target, mountain_arr, lo, mid, vlo, vmid)
-            if i != -1: return i
-            return self._find_from_monotonic_array(target, mountain_arr, mid + 1, hi, vnext, vhi, False)
-
-    def _find_from_monotonic_array(self, target, mountain_arr, lo, hi, vlo, vhi, increase):
-        # 边界值处理,确保target在[lo,hi]的区间内
-        if self._compare(target, vlo, increase) or self._compare(vhi, target, increase):
-            return -1
-
-        while lo <= hi:
-            mid = lo + (hi - lo) // 2
-            vmid = mountain_arr.get(mid)
-            if vmid == target:
-                return mid
-
-            if self._compare(vmid, target, increase):
-                lo = mid + 1
-            else:
-                hi = mid - 1
-        return -1
-
-    def _compare(self, n1, n2, increase):
-        if increase:
-            return n1 < n2
-        else:
-            return n1 > n2
-
-# 法二: 先找峰值然后分两段求解
-class Solution:
-    def findInMountainArray(self, target: int, mountain_arr: 'MountainArray') -> int:
-        n = mountain_arr.length()
-        index = self._find_mountain(mountain_arr, 0, n - 1)
-        v1 = mountain_arr.get(0)
-        vm = mountain_arr.get(index)
-        v2 = mountain_arr.get(n - 1)
-        if v1 <= target <= vm:
-            i = self._find_from_monotonic_array(target, mountain_arr, 0, index, True)
-            if i != -1: return i
-        if v2 <= target <= vm:
-            i = self._find_from_monotonic_array(target, mountain_arr, index + 1, n - 1, False)
-            if i != -1: return i
-        return -1
-
-    def _find_mountain(self, mountain_arr, lo, hi):
+    def find(self, mountain_arr, lo, hi, target):
         while lo < hi:
-            mid = lo + (hi - lo) // 2
-            vmid = mountain_arr.get(mid)
-            vnext = mountain_arr.get(mid + 1)
-            if vmid < vnext:
+            mid = (lo + hi) >> 1
+            vm = mountain_arr.get(mid)
+            nv = mountain_arr.get(mid + 1)
+            # lo~mid段递增
+            if vm < nv:
+                # target若大于vm则不可能在左半段,没有查找的必要
+                if target <= vm:
+                    index = self.binary_search(mountain_arr, lo, mid + 1, target, 1)
+                    if index != -1: return index
+                lo = mid + 1
+            # mid~hi段递减
+            else:
+                # 递归
+                index = self.find(mountain_arr, lo, mid, target)
+                if index != -1: return index
+                # target若大于nv则不可能在右半段,没有查找的必要
+                if target > nv:
+                    return -1
+                else:
+                    return self.binary_search(mountain_arr, mid + 1, hi + 1, target, -1)
+        return lo if mountain_arr.get(lo) == target else -1
+
+    # 带符号的二分法
+    def binary_search(self, nums, lo, hi, target, flag):
+        n = hi
+        while lo < hi:
+            mid = (lo + hi) >> 1
+            if (nums.get(mid) - target) * flag < 0:
                 lo = mid + 1
             else:
                 hi = mid
-        return lo
 
-
-    def _find_from_monotonic_array(self, target, mountain_arr, lo, hi, increase):
-        while lo <= hi:
-            mid = lo + (hi - lo) // 2
-            vmid = mountain_arr.get(mid)
-            if vmid == target:
-                return mid
-
-            if self._compare(vmid, target, increase):
-                lo = mid + 1
-            else:
-                hi = mid - 1
-        return -1
-
-    def _compare(self, n1, n2, increase):
-        if increase:
-            return n1 < n2
+        if lo < n and nums.get(lo) == target:
+            return lo
         else:
-            return n1 > n2
+            return -1
