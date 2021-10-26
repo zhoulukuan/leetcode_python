@@ -1,14 +1,22 @@
 import random
-import bisect
 class Solution:
+
     def __init__(self, w: List[int]):
-        s = sum(w)
-        self.probability = [weight for weight in w]
-        for i in range(len(w)):
-            self.probability[i] /= float(s)
-            if i > 0:
-                self.probability[i] += self.probability[i - 1]
-            
+        self.w = w
+        self.n = len(self.w)
+        self.sum = self.w[0]
+        for i in range(1, self.n):
+            self.sum += self.w[i]
+            self.w[i] += self.w[i - 1]
 
     def pickIndex(self) -> int:
-        return bisect.bisect_left(self.probability, random.random())
+        num = random.random() * self.sum
+        lo, hi = 0, self.n
+        while lo < hi:
+            mid = lo + (hi - lo) // 2
+            if self.w[mid] <= num:
+                lo = mid + 1
+            else:
+                hi = mid
+        return lo
+
