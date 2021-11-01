@@ -1,34 +1,37 @@
-class Solution:
-    def sortList(self, head: ListNode) -> ListNode:
-        if head is None or head.next is None: return head
-        first = head
-        second = head
-        while second.next:
-            second = second.next
-            if second.next:
-                second = second.next
-                first = first.next
-        
-        n1 = head
-        n2 = first.next
-        first.next = None
-        n1 = self.sortList(n1)
-        n2 = self.sortList(n2)
-        n3 = ListNode()
-        ans = n3
-        while n1 and n2:
-            if n1.val <= n2.val:
-                n3.next = n1
-                n1 = n1.next
-                n3 = n3.next
-                n3.next = None
-            else:
-                n3.next = n2
-                n2 = n2.next
-                n3 = n3.next
-                n3.next = None
-        if n1:
-            n3.next = n1
-        if n2:
-            n3.next = n2
-        return ans.next
+class Solution:
+    def sortList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        if head is None or head.next is None:
+            return head
+
+        # 切分
+        first = head
+        second = head.next
+        while second is not None:
+            second = second.next
+            if second: 
+                second = second.next
+                first = first.next
+        half1 = head
+        half2 = first.next
+        first.next = None
+
+        # merge
+        half1 = self.sortList(half1)
+        half2 = self.sortList(half2)
+        visual = ListNode(0)
+        node = visual
+        while half1 and half2:
+            val1 = half1.val
+            val2 = half2.val
+            if val1 <= val2:
+                node.next = half1
+                half1 = half1.next
+            else:
+                node.next = half2
+                half2 = half2.next
+            node = node.next
+        if half1:
+            node.next = half1
+        if half2:
+            node.next = half2
+        return visual.next
