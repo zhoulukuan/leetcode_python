@@ -1,14 +1,16 @@
 class Solution:
     def reverseList(self, head: ListNode) -> ListNode:
-        curr_node = head
-        if head:
-            next_node = curr_node.next
-        else:
+        if not head or not head.next:
             return head
 
-        while next_node:
-            next_next_node = next_node.next
-            next_node.next = curr_node
-            curr_node, next_node = next_node, next_next_node
+        visual = ListNode(0)
+        visual.next = head
+
+        pre = visual
+        curr = head
+        while curr:
+            next = curr.next
+            curr.next = pre
+            curr, pre = next, curr
         head.next = None
-        return curr_node
+        return pre
