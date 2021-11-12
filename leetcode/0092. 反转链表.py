@@ -1,23 +1,22 @@
 class Solution:
     def reverseBetween(self, head: ListNode, left: int, right: int) -> ListNode:
-        curr = ListNode(0)
-        curr.next = head
-        head = curr
-        offset = right - left
-        while left > 1 and curr.next:
-            curr = curr.next
-            left -= 1
+        if left == right or not head or not head.next: return head
 
-        stack = []
-        node = curr.next
-        while offset >= 0:
-            stack.append(node)
+        visual = ListNode(0, head)
+        start = visual
+        for _ in range(left - 1):
+            start = start.next
+        curr = start.next
+
+        nodes = []
+        for _ in range(right - left + 1):
+            nodes.append(curr)
+            curr = curr.next
+        end = curr
+
+        node = start
+        for _ in range(len(nodes)):
+            node.next = nodes.pop()
             node = node.next
-            offset -= 1
-
-        while len(stack) > 0:
-            n = stack.pop()
-            curr.next = n
-            curr = curr.next
-        curr.next = node
-        return head.next
+        node.next = end
+        return visual.next
