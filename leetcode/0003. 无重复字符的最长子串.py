@@ -16,3 +16,28 @@ class Solution:
             d[s[i]] = i
             max_len = max(max_len, i - start_pos)
         return max_len
+    
+from collections import defaultdict
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        n = len(s)
+        low, fast = 0, 0
+        times = defaultdict(int)
+        diffNum, totalNum = 0, 0
+        ans = 0
+        while fast < n:
+            char = s[fast]
+            times[char] += 1
+            totalNum += 1
+            if times[char] == 1:
+                diffNum += 1
+            while totalNum > diffNum:
+                char = s[low]
+                low += 1
+                times[char] -= 1
+                totalNum -= 1
+                if times[char] == 0:
+                    diffNum -= 1
+            ans = max(ans, fast - low + 1)
+            fast += 1
+        return ans
