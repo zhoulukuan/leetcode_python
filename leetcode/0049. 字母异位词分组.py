@@ -1,38 +1,29 @@
-class Solution:
-    def groupAnagrams(self, strs):
-        p = self.prime()
-        self.num = [next(p) for _ in range(26)]
-        d = {}
-        for string in strs:
-            num = self.str2num(string)
-            if num in d:
-                d[num].append(string)
-            else:
-                d[num] = [string]
-        ans = []
-        for value in d.values():
-            ans.append(value)
-        return ans
+from collections import defaultdict
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        prime = self.genPrime()
+        def strToNum(str):
+            num = 1
+            for char in str:
+                num *= prime[ord(char) - ord('a')]
+            return num
 
-    def str2num(self, s):
-        # 哈希表映射
-        ans = 1
-        for i in s:
-            ans *= self.num[ord(i) - ord('a')]
-        return ans
+        d = defaultdict(list)
+        for str in strs:
+            num = strToNum(str)
+            d[num].append(str)
+        ans = []
+        for key, values in d.items():
+            ans.append(values)
+        return ans
 
-    def prime(self):
-        # 素数生成器,生成1000以内的素数
-        def odd_iters():
-            n = 1
-            while n < 1000:
-                n += 2
-                yield n
-
-        yield 2
-        it = odd_iters()
-        while True:
-            n = next(it)
-            yield n
-            # lambda表达式无法访问外部变量,所以必须把n的值传进去
-            it = filter(lambda x, n = n: x % n > 0, it)
+    def genPrime(self):
+        nums = [i for i in range(2, 200)]
+        ans = []
+        index = 0
+        while index < 26:
+            num = nums[index]
+            index += 1
+            ans.append(num)
+            nums = [i for i in nums if i % num > 0]
+        return ans
