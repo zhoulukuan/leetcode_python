@@ -1,47 +1,49 @@
+class ListNode:
+    def __init__(self, key=0, val=0, pre=None, next=None):
+        self.key = key
+        self.val = val
+        self.pre = pre
+        self.next = next
+
 class LRUCache:
 
     def __init__(self, capacity: int):
-        self.hashmap = dict()
         self.capacity = capacity
-        self.num = 0
-
-        self.head = ListNode(0)
-        self.tail = ListNode(0)
-        self.head.next = self.tail
-        self.tail.prev = self.head
+        self.curr = 0
+        self.head = ListNode(-10000)
+        self.tail = self.head
+        self.hash = {}
 
     def get(self, key: int) -> int:
-        if key not in self.hashmap:
+        if key not in self.hash:
             return -1
-        node = self.hashmap[key]
-
+        node = self.hash[key]
         self.del_node(node)
-        self.add_node_tail(node)
+        self.add_node_to_tail(node)
         return node.val
 
-
     def put(self, key: int, value: int) -> None:
-        if key in self.hashmap:
-            node = self.hashmap[key]
-            node.val = value
-            self.del_node(node)
-            self.add_node_tail(node)
+        node = ListNode(key, value)
+        if key in self.hash:
+            self.del_node(self.hash[key])
+        self.add_node_to_tail(node)
+        if self.curr > self.capacity:
+            self.del_node(self.head.next)
+
+    def del_node(self, delete):
+        if delete == self.tail:
+            pre = self.tail.pre
+            pre.next = None
+            self.tail = pre
         else:
-            if self.num >= self.capacity:
-                self.hashmap.pop(self.head.next.key)
-                self.del_node(self.head.next)
-                self.num -= 1
-            node = ListNode(key, value)
-            self.add_node_tail(node)
-            self.hashmap[key] = node
-            self.num += 1
+            pre, next = delete.pre, delete.next
+            pre.next, next.pre = next, pre
+        self.curr -= 1
+        self.hash.pop(delete.key)
 
-    def del_node(self, node):
-        prev = node.prev
-        next = node.next
-        prev.next, next.prev = next, prev
-
-    def add_node_tail(self, node):
-        last = self.tail.prev
-        last.next, node.next = node, self.tail
-        node.prev, self.tail.prev = last, node
+    def add_node_to_tail(self, node):
+        self.tail.next = node
+        node.pre, node.next = self.tail, None
+        self.tail = node
+        self.curr += 1
+        self.hash[node.key] = node
