@@ -1,25 +1,21 @@
 import heapq
+from typing import List
 class Solution:
     def mergeKLists(self, lists: List[ListNode]) -> ListNode:
-        n = len(lists)
-        count = 0
-        heap = []
-        for i in range(n):
-            node = lists[i]
-            if node:
-                heapq.heappush(heap, (node.val, i, node))
-                count += 1
+        def __lt__(a: ListNode, b: ListNode):
+            return a.val < b.val
+        ListNode.__lt__ = __lt__
 
-        head = ListNode(0)
-        curr = head
-        while count > 0:
-            _, i, node = heapq.heappop(heap)
-            lists[i] = node.next
+        candidate = []
+        for node in lists:
+            heapq.heappush(candidate, (node.val, node))
+
+        curr = ListNode(0)
+        head = curr
+        while len(candidate) > 0:
+            val, node = heapq.heappop(candidate)
+            if node.next:
+                heapq.heappush(candidate, (node.next.val, node.next))
             curr.next = node
-            node.next = None
             curr = curr.next
-            if lists[i]:
-                heapq.heappush(heap, (lists[i].val, i, lists[i]))
-            else:
-                count -= 1
         return head.next
