@@ -1,21 +1,21 @@
 from collections import defaultdict
 class FreqStack:
-
     def __init__(self):
-        self.stack = defaultdict(list)
-        self.counter = defaultdict(int)
-        self.maxFreq = 0
+        self.max_freq = 0
+        self.counter = defaultdict(list)
+        self.freq = defaultdict(int)
 
     def push(self, val: int) -> None:
-        f = self.counter[val] + 1
-        self.counter[val] = f
-        if f > self.maxFreq:
-            self.maxFreq = f
-        self.stack[f].append(val)
+        f = self.freq[val]
+        f += 1
+        self.freq[val] = f
+        self.counter[f].append(val)
+        if self.freq[val] > self.max_freq:
+            self.max_freq = self.freq[val]
 
     def pop(self) -> int:
-        res = self.stack[self.maxFreq].pop()
-        self.counter[res] -= 1
-        while not self.stack[self.maxFreq] and self.maxFreq > 0:
-            self.maxFreq -= 1
-        return res
+        num = self.counter[self.max_freq].pop()
+        self.freq[num] -= 1
+        while not self.counter[self.max_freq] and self.max_freq > 0:
+            self.max_freq -= 1
+        return num
