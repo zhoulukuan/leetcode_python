@@ -1,29 +1,18 @@
 from collections import deque
 class Solution:
-    def __init__(self):
-        self.m = 0
-        self.n = 0
-        self.set = set()
-
-    def solve(self, board):
+    def solve(self, board: List[List[str]]) -> None:
         """
         Do not return anything, modify board in-place instead.
         """
         m = len(board)
-        if m == 0: return None
         n = len(board[0])
-        if n == 0: return None
-        self.m, self.n = m, n
-
-        for i in range(n):
-            self.helper(board, 0, i)
-        for i in range(n):
-            self.helper(board, m - 1, i)
-        for j in range(m):
-            self.helper(board, j, 0)
-        for j in range(m):
-            self.helper(board, j, n - 1)
-
+        for i in range(m):
+            self.helper(i, 0, board, m, n)
+            self.helper(i, n - 1, board, m, n)
+        for j in range(n):
+            self.helper(0, j, board, m, n)
+            self.helper(m - 1, j, board, m, n)
+        
         for i in range(m):
             for j in range(n):
                 if board[i][j] == 'Y':
@@ -31,27 +20,16 @@ class Solution:
                 else:
                     board[i][j] = 'X'
 
-    # 遍历过的节点要设置条件,否则会产生非常大的计算量
-    def helper(self, board, i, j):
-        def check(i, j):
-            # == 'O'的条件隐含了该点是未遍历过的
-            return 0 <= i < self.m and 0 <= j < self.n and board[i][j] == 'O'
-
-        if check(i, j):
-            queue = deque()
-            queue.append([i, j])
-            while len(queue) > 0:
-                i, j = queue.popleft()
-                board[i][j] = 'Y'
-                if check(i - 1, j):
-                    board[i - 1][j] = 'Y'
-                    queue.append([i - 1, j])
-                if check(i + 1, j):
-                    board[i + 1][j] = 'Y'
-                    queue.append([i + 1, j])
-                if check(i, j - 1):
-                    board[i][j - 1] = 'Y'
-                    queue.append([i, j - 1])
-                if check(i, j + 1):
-                    board[i][j + 1] = 'Y'
-                    queue.append([i, j + 1])
+    def helper(self, x, y, board, m, n):
+        if board[x][y] != 'O':
+            return
+        q = deque()
+        q.append((x, y))
+        while q:
+            x, y = q.popleft()
+            board[x][y] = 'Y'
+            for dx, dy in ((-1, 0), (1, 0), (0, 1), (0, -1)):
+                new_x, new_y = x + dx, y + dy
+                if 0 <= new_x < m and 0 <= new_y < n and board[new_x][new_y] == 'O':
+                    board[new_x][new_y] = 'Y'
+                    q.append((new_x, new_y))
