@@ -1,34 +1,33 @@
 from collections import deque
 class Solution:
     def openLock(self, deadends: List[str], target: str) -> int:
-        if '0000' in deadends: return -1
-        queue = deque()
-        visited = set()
-        queue.append('0000')
-        visited.add('0000')
-        for s in deadends: visited.add(s)
-        surrounds = [[1, 0, 0, 0], [-1, 0, 0, 0], [0, 1, 0, 0], [0, -1, 0, 0],
-                [0, 0, 1, 0], [0, 0, -1, 0], [0, 0, 0, 1], [0, 0, 0, -1],]
-        
-        level = 0
-        while queue:
-            size = len(queue)
-            for _ in range(size):
-                num = queue.popleft()
-                if num == target: return level
-                for surround in surrounds:
-                    next_num = self.compute(num, surround)
-                    if next_num not in visited:
-                        queue.append(next_num)
-                        visited.add(next_num)
-            level += 1
-        return -1
+        dead = set()
+        for end in deadends:
+            dead.add(end)
+        if '0000' in dead: return -1
 
-    def compute(self, num, surround):
-        s = ''
-        for i in range(4):
-            n = int(num[i]) + surround[i]
-            if n == -1: n = 9
-            elif n == 10: n = 1
-            s += str(n)
-        return s
+        q = deque()
+        q.append('0000')
+        visit = set()
+        visit.add('0000')
+        curr_level = 0
+        while q:
+            curr_num = len(q)
+            for _ in range(curr_num):
+                nums = q.popleft()
+                if nums == target:
+                    return curr_level
+                for i in range(4):
+                    c1 = int(nums[i]) - 1
+                    c2 = int(nums[i]) + 1
+                    if c1 == -1: c1 = 9
+                    if c2 == 10: c2 = 0
+                    for j in (c1, c2):
+                        new_num = list(nums)
+                        new_num[i] = str(j)
+                        new_num = "".join(new_num)
+                        if new_num not in visit and new_num not in dead:
+                            visit.add(new_num)
+                            q.append(new_num)
+            curr_level += 1
+        return -1
