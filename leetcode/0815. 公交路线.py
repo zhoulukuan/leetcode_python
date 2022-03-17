@@ -1,25 +1,29 @@
 from collections import deque
 class Solution:
-    def numBusesToDestination(self, routes, source: int, target: int) -> int:
-        n = len(routes)
+    def numBusesToDestination(self, routes: List[List[int]], source: int, target: int) -> int:
+        if source == target: return 0
         routes = [set(route) for route in routes]
-        visited_routes = set()
-        visited_station = set()
-        queue = deque()
-        queue.append(source)
+        n = len(routes)
+        visisted = [False for _ in range(n)]
 
-        level = 0
-        while queue:
-            size = len(queue)
-            for _ in range(size):
-                station = queue.popleft()
-                if station == target: return level
-                for i in range(n):
-                    route = routes[i]
-                    if i not in visited_routes and station in route:
-                        for s in route:
-                            queue.append(s)
-                            if s not in visited_station: visited_station.add(s)
-                        visited_routes.add(i)
-            level += 1
+
+        q = deque()
+        for i, route in enumerate(routes):
+            if source in route:
+                q.append(route)
+                visisted[i] = True
+        curr_level = 1
+
+        while q:
+            curr_num = len(q)
+            for _ in range(curr_num):
+                curr_route = q.popleft()
+                if target in curr_route:
+                    return curr_level
+                for station in curr_route:
+                    for i, next_route in enumerate(routes):
+                        if not visisted[i] and station in next_route:
+                            visisted[i] = True
+                            q.append(next_route)
+            curr_level += 1
         return -1
