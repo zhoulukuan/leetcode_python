@@ -7,7 +7,6 @@ class Solution:
         ans = b
         for i in range(2, len(nums)):
             curr = max(a + nums[i], b)
-            print(curr)
             a, b = b, curr
             ans = max(ans, curr)
         return ans
